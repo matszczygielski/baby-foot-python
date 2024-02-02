@@ -49,26 +49,30 @@ def get_team_match_id_by_timestamp_and_by_team_id(team1_id,team2_id, date, cur):
         return (team_match1_id,team_match2_id)
 
 
+def get_player_id_from_first_last_name(player_first_name, player_last_name):
+    with psycopg2.connect(**DATABASE_CONFIG) as conn:
+        cur = conn.cursor()
+        cur.execute("SELECT player_id FROM player WHERE first_name=%s AND last_name=%s", (player_first_name, player_last_name))
+        fetch = cur.fetchone()
+        player_id = None if fetch == None else fetch[0]
 
+    return player_id
+
+def get_player_id(player_name):
+    first_name = player_name.split(" ")[0]
+    last_name = player_name.split(" ")[1]
+
+    return get_player_id_from_first_last_name(first_name, last_name)
 
 # Get the player ID of the players playing a match
-def get_player_id(player1_name, player2_name, player3_name, player4_name, cur):
-        cur.execute("SELECT player_id FROM player WHERE first_name=%s", (player1_name,))
-        player1_id = cur.fetchone()[0]
+def get_player_ids(player1_name, player2_name, player3_name, player4_name):
+        out = [None, None, None, None]
 
-        cur.execute("SELECT player_id FROM player WHERE first_name=%s", (player2_name,))
-        player2_id = cur.fetchone()[0]
-
-
-        cur.execute("SELECT player_id FROM player WHERE first_name=%s", (player3_name,))
-        player3_id = cur.fetchone()[0]
-
-        cur.execute("SELECT player_id FROM player WHERE first_name=%s", (player4_name,))
-        player4_id = cur.fetchone()[0]
-
+        for idx, name in enumerate([player1_name, player2_name, player3_name, player4_name]):
+            out[idx] = get_player_id(name)
 
         # Return a tuple containing all the player IDs
-        return (player1_id, player2_id, player3_id, player4_id)
+        return (out[0], out[1], out[2], out[3])
 
 
 
@@ -210,13 +214,15 @@ def process_game_data(player1_name, player2_name, team1_score, player3_name, pla
     # Check if the player name is not empty
     if player1_name:
       # Check if the player already exists in the Player table
-      cur.execute("SELECT player_id FROM player WHERE first_name=%s", (player1_name,))
+      player_first_name = player1_name.split(" ")[0]
+      player_last_name = player1_name.split(" ")[1]
+      cur.execute("SELECT player_id FROM player WHERE first_name=%s AND last_name=%s", (player_first_name, player_last_name))
       player1_id = cur.fetchone()
       if player1_id is None:
         # If the player does not exist, insert them into the players table with a unique id
         cur.execute("SELECT nextval('player_id_seq')")
         id = cur.fetchone()[0]
-        cur.execute("INSERT INTO player (player_id, first_name) VALUES (%s, %s)", (id, player1_name))
+        cur.execute("INSERT INTO player (player_id, first_name, last_name) VALUES (%s, %s, %s)", (id, player_first_name, player_last_name))
         player1_id = id
       else:
         # If the player already exists, retrieve their player_id
@@ -226,14 +232,16 @@ def process_game_data(player1_name, player2_name, team1_score, player3_name, pla
 
   # Check if the player2 first_name is not empty
     if player2_name:
+      player_first_name = player2_name.split(" ")[0]
+      player_last_name = player2_name.split(" ")[1]
       # Check if the player already exists in the Players table
-      cur.execute("SELECT player_id FROM player WHERE first_name=%s", (player2_name,))
+      cur.execute("SELECT player_id FROM player WHERE first_name=%s AND last_name=%s", (player_first_name, player_last_name))
       player2_id = cur.fetchone()
       if player2_id is None:
         # If the player does not exist, insert them into the players table with a unique id
         cur.execute("SELECT nextval('player_id_seq')")
         id = cur.fetchone()[0]
-        cur.execute("INSERT INTO player (player_id, first_name) VALUES (%s, %s)", (id, player2_name))
+        cur.execute("INSERT INTO player (player_id, first_name, last_name) VALUES (%s, %s, %s)", (id, player_first_name, player_last_name))
         player2_id = id
       else:
         # If the player already exists, retrieve their player_id
@@ -242,14 +250,16 @@ def process_game_data(player1_name, player2_name, team1_score, player3_name, pla
 
   # Check if the player3 first_name is not empty
     if player3_name:
+      player_first_name = player3_name.split(" ")[0]
+      player_last_name = player3_name.split(" ")[1]
       # Check if the player already exists in the Players table
-      cur.execute("SELECT player_id FROM player WHERE first_name=%s", (str(player3_name),))
+      cur.execute("SELECT player_id FROM player WHERE first_name=%s AND last_name=%s", (player_first_name, player_last_name))
       player3_id = cur.fetchone()
       if player3_id is None:
         # If the player does not exist, insert them into the players table with a unique id
         cur.execute("SELECT nextval('player_id_seq')")
         id = cur.fetchone()[0]
-        cur.execute("INSERT INTO player (player_id, first_name) VALUES (%s, %s)", (id, player3_name))
+        cur.execute("INSERT INTO player (player_id, first_name, last_name) VALUES (%s, %s, %s)", (id, player_first_name, player_last_name))
         player3_id = id
       else:
         # If the player already exists, retrieve their player_id
@@ -258,14 +268,16 @@ def process_game_data(player1_name, player2_name, team1_score, player3_name, pla
 
   # Check if the player4 first_name is not empty
     if player4_name:
+      player_first_name = player4_name.split(" ")[0]
+      player_last_name = player4_name.split(" ")[1]
       # Check if the player already exists in the Players table
-      cur.execute("SELECT player_id FROM player WHERE first_name=%s", (player4_name,))
+      cur.execute("SELECT player_id FROM player WHERE first_name=%s AND last_name=%s", (player_first_name, player_last_name))
       player4_id = cur.fetchone()
       if player4_id is None:
         # If the player does not exist, insert them into the players table with a unique id
         cur.execute("SELECT nextval('player_id_seq')")
         id = cur.fetchone()[0]
-        cur.execute("INSERT INTO player (player_id, first_name) VALUES (%s, %s)", (id, player4_name))
+        cur.execute("INSERT INTO player (player_id, first_name, last_name) VALUES (%s, %s, %s)", (id, player_first_name, player_last_name))
         player4_id = id
       else:
         # If the player already exists, retrieve their id
@@ -355,7 +367,7 @@ def process_game_data(player1_name, player2_name, team1_score, player3_name, pla
 
 
 # Call the get_player_id function inside the loop
-    player1_id, player2_id, player3_id, player4_id = get_player_id(player1_name, player2_name, player3_name, player4_name, cur)
+    player1_id, player2_id, player3_id, player4_id = get_player_ids(player1_name, player2_name, player3_name, player4_name)
 
     # Call the insert_team_or_get_team_id function inside the loop
     team1_id, team2_id = insert_team_or_get_team_id(player1_id, player2_id, player3_id, player4_id, cur)
@@ -414,16 +426,16 @@ def process_game_data(player1_name, player2_name, team1_score, player3_name, pla
    
     # Calculate the K value for each player based on the number of games played and their rating
 
-    k1 = 50 / (1 + number_of_game_player1 / 300)
-    k2 = 50 / (1 + number_of_game_player2 / 300) 
-    k3 = 50 / (1 + number_of_game_player3 / 300) 
-    k4 = 50 / (1 + number_of_game_player4 / 300) 
+    k1 = 50 / (1 + number_of_game_player1 / 20)
+    k2 = 50 / (1 + number_of_game_player2 / 20) 
+    k3 = 50 / (1 + number_of_game_player3 / 20) 
+    k4 = 50 / (1 + number_of_game_player4 / 20) 
 
     #delta = 32 * (1 - winnerChanceToWin)
 
     # Calculate the K value for each team based on the number of games played
-    k5 = 50 / (1 + number_of_games_team1/ 100)
-    k6 = 50 / (1 + number_of_games_team2/ 100)
+    k5 = 50 / (1 + number_of_games_team1/ 10)
+    k6 = 50 / (1 + number_of_games_team2/ 10)
 
  #logg the wining team
     if team1_score > team2_score:
@@ -487,7 +499,7 @@ def calculate_expected_score(player1_name, player2_name, player3_name, player4_n
 
     
   # Call the get_player_id function inside the loop
-    player1_id, player2_id, player3_id, player4_id = get_player_id(player1_name, player2_name, player3_name, player4_name, cur)
+    player1_id, player2_id, player3_id, player4_id = get_player_ids(player1_name, player2_name, player3_name, player4_name)
 
   # Call the get_player_ratings function inside the loop
     player1_rating, player2_rating, player3_rating, player4_rating = get_player_ratings(player1_id, player2_id, player3_id, player4_id, cur)
@@ -529,38 +541,17 @@ def calculate_expected_score(player1_name, player2_name, player3_name, player4_n
 
 
 # Get the players from the database
-def get_players():
-    try:
-        conn = psycopg2.connect(
-            host=DATABASE_CONFIG['host'],
-            database=DATABASE_CONFIG['database'],
-            user=DATABASE_CONFIG['user'],
-            password=DATABASE_CONFIG['password']
-        )
-        cursor = conn.cursor()
-        query = "SELECT first_name FROM player WHERE active = true ORDER BY first_name ASC;"  # 
-        cursor.execute(query)
-        players = cursor.fetchall()
-        print("Players fetched:", players)  # Add this line to print the fetched players
-        return [player[0] for player in players]
-       
-    except Exception as e:
-        print("Error connecting to the database:", e)
-        return []
-    finally:
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()
-
-def get_players_full_list():
-    query = 'SELECT first_name FROM player ORDER BY first_name ASC'
+def get_players(active_players_only: bool = True):
+    query = 'SELECT CONCAT(first_name, \' \', last_name) AS player_name FROM player ORDER BY player_name ASC'
+    if active_players_only:
+        query = 'SELECT CONCAT(first_name, \' \', last_name) AS player_name FROM player WHERE active = true ORDER BY player_name ASC'
     with psycopg2.connect(**DATABASE_CONFIG) as conn:
         cur = conn.cursor()
         cur.execute(query)
-        players_full = cur.fetchall()
+        players = cur.fetchall()
 
-    return [player[0] for player in players_full]
+    return [player[0] for player in players]
+
 
 def get_players_detailed_list():
     query = 'SELECT player_id, first_name, last_name, active FROM player ORDER BY first_name ASC'
@@ -604,7 +595,7 @@ def get_latest_player_ratings(month=None, year=None):
             WHERE match_timestamp BETWEEN %s AND %s
         )
         SELECT 
-            CONCAT(p.first_name, '.', SUBSTRING(p.last_name FROM 1 FOR 1)) as player_name, 
+            CONCAT(p.first_name, ' ', p.last_name) as player_name, 
             pr.rating, 
             COUNT(DISTINCT fpm.match_id) as num_matches,
             pr.player_rating_timestamp
@@ -637,11 +628,11 @@ def get_match_list(month=None):
     query = f'''
         SELECT 
             m.match_id as ID,
-            P1.first_name AS player_1,
-            P2.first_name AS player_2,
+            CONCAT(P1.first_name, ' ', P1.last_name) AS player_1,
+            CONCAT(P2.first_name, ' ', P2.last_name) AS player_2,
             M.winning_team_score AS score_team_1,
-            P3.first_name AS player_3,
-            P4.first_name AS player_4,
+            CONCAT(P3.first_name, ' ', P3.last_name) AS player_3,
+            CONCAT(P4.first_name, ' ', P4.last_name) AS player_4,
             M.losing_team_score AS score_team_2,
             M.match_timestamp
         FROM Match M
@@ -689,17 +680,17 @@ def create_game():
         print(f"player4_name: {player4_name}")
         team2_score = int(request.form['team2_score'])
         print(f"team2_score: {team2_score}")
-        date = request.form['game_date']
+        #date = request.form['game_date']
 
     
-        print(f"date: {date}")
+        #print(f"date: {date}")
 
         # Get the current time in the desired time zone
         tz = pytz.timezone(timezone)
-        now = datetime.now(tz).strftime('%H:%M:%S')
+        date_str = datetime.now(tz).strftime('%Y-%m-%d %H:%M:%S')
         
         # Convert date to string in the desired format with current time
-        date_str = datetime.strptime(date, '%Y-%m-%d').strftime(f'%Y-%m-%d {now}')
+        #date_str = datetime.strptime(date, '%Y-%m-%d').strftime(f'%Y-%m-%d {now}')
 
 
         # Process the form data and update the database
@@ -720,7 +711,7 @@ def get_last_match():
 def get_player_ratings_before_after():
     with psycopg2.connect(**DATABASE_CONFIG) as conn:
         cur = conn.cursor()
-        cur.execute("WITH last_match AS (SELECT m.match_id as match_id, m.match_timestamp as match_time, wt.team_player_1_id AS player1_id, wt.team_player_2_id AS player2_id, lt.team_player_1_id AS player3_id, lt.team_player_2_id AS player4_id FROM Match m INNER JOIN Team wt ON m.winning_team_id = wt.team_id INNER JOIN Team lt ON m.losing_team_id = lt.team_id ORDER BY m.match_id DESC LIMIT 1), player_ratings AS (SELECT pm.player_id, pr.rating, pr.player_rating_timestamp, ROW_NUMBER() OVER (PARTITION BY pm.player_id ORDER BY pr.player_rating_timestamp DESC) AS rn FROM PlayerRating pr INNER JOIN PlayerMatch pm ON pr.player_match_id = pm.player_match_id WHERE pm.player_id IN (SELECT player1_id FROM last_match UNION ALL SELECT player2_id FROM last_match UNION ALL SELECT player3_id FROM last_match UNION ALL SELECT player4_id FROM last_match)) SELECT p.player_id, p.first_name, pr_before.rating AS rating_before, pr_after.rating AS rating_after FROM Player p LEFT JOIN player_ratings pr_before ON p.player_id = pr_before.player_id AND pr_before.rn = 2 LEFT JOIN player_ratings pr_after ON p.player_id = pr_after.player_id AND pr_after.rn = 1 WHERE p.player_id IN (SELECT player1_id FROM last_match UNION ALL SELECT player2_id FROM last_match UNION ALL SELECT player3_id FROM last_match UNION ALL SELECT player4_id FROM last_match) ORDER BY p.player_id;")
+        cur.execute("WITH last_match AS (SELECT m.match_id as match_id, m.match_timestamp as match_time, wt.team_player_1_id AS player1_id, wt.team_player_2_id AS player2_id, lt.team_player_1_id AS player3_id, lt.team_player_2_id AS player4_id FROM Match m INNER JOIN Team wt ON m.winning_team_id = wt.team_id INNER JOIN Team lt ON m.losing_team_id = lt.team_id ORDER BY m.match_id DESC LIMIT 1), player_ratings AS (SELECT pm.player_id, pr.rating, pr.player_rating_timestamp, ROW_NUMBER() OVER (PARTITION BY pm.player_id ORDER BY pr.player_rating_timestamp DESC) AS rn FROM PlayerRating pr INNER JOIN PlayerMatch pm ON pr.player_match_id = pm.player_match_id WHERE pm.player_id IN (SELECT player1_id FROM last_match UNION ALL SELECT player2_id FROM last_match UNION ALL SELECT player3_id FROM last_match UNION ALL SELECT player4_id FROM last_match)) SELECT p.player_id, p.first_name, p.last_name, pr_before.rating AS rating_before, pr_after.rating AS rating_after FROM Player p LEFT JOIN player_ratings pr_before ON p.player_id = pr_before.player_id AND pr_before.rn = 2 LEFT JOIN player_ratings pr_after ON p.player_id = pr_after.player_id AND pr_after.rn = 1 WHERE p.player_id IN (SELECT player1_id FROM last_match UNION ALL SELECT player2_id FROM last_match UNION ALL SELECT player3_id FROM last_match UNION ALL SELECT player4_id FROM last_match) ORDER BY p.player_id;")
         results = cur.fetchall()
         
     return results
@@ -829,6 +820,8 @@ def add_player():
     if request.method == 'POST':
         first_name = request.form['first_name']
         last_name = request.form['last_name']
+        if get_player_id_from_first_last_name(first_name, last_name) != None:
+            return abort(400)
         conn = psycopg2.connect(**DATABASE_CONFIG)
         cursor = conn.cursor()
         cursor.execute("SELECT nextval('player_id_seq')")
@@ -851,6 +844,15 @@ def edit_player(player_id):
 
         with psycopg2.connect(**DATABASE_CONFIG) as conn:
             with conn.cursor() as cur:
+                cur.execute("SELECT player_id, first_name, last_name, active FROM Player WHERE player_id = %s", (player_id,))
+                old_player = cur.fetchone()
+
+                # Name is updated
+                if (old_player[1] != first_name or old_player[2] != last_name):
+                    # Check if requested name already exist
+                    if get_player_id_from_first_last_name(first_name, last_name) != None:
+                        return abort(400)
+
                 cur.execute("UPDATE Player SET first_name = %s, last_name = %s, active = %s WHERE player_id = %s",
                             (first_name, last_name, active, player_id))
                 conn.commit()
@@ -901,29 +903,12 @@ def rating_evolution():
 def do_more():
     return render_template('do_more.html')
 
-def get_player_id_metrics(player_name):
-    conn = psycopg2.connect(
-        host=DATABASE_CONFIG['host'],
-        database=DATABASE_CONFIG['database'],
-        user=DATABASE_CONFIG['user'],
-        password=DATABASE_CONFIG['password']
-    )
-    cur = conn.cursor()
-
-    cur.execute("SELECT player_id FROM player WHERE first_name=%s", (player_name,))
-    player_id = cur.fetchone()[0]
-
-    cur.close()
-    conn.close()
-
-    return player_id
-
 
 @app.route('/metrics', methods=['GET', 'POST'])
 def player_stats_route():
     if request.method == 'POST':
         player_name = request.form['player_name']
-        player_id = get_player_id_metrics(player_name) 
+        player_id = get_player_id(player_name) 
         
         # Query the database to get the player stats
         conn = psycopg2.connect(
@@ -1081,12 +1066,12 @@ def player_stats_route():
         conn.close()
 
         # Pass the player stats to the template
-        players = get_players_full_list()
+        players = get_players(False)
 
         return render_template('metrics.html', players=players,player_name=player_name, total_games=total_games, total_wins=total_wins, total_losses=total_losses,avg_score=avg_score,player_most_played_with=player_most_played_with,player_most_played_with_win_rate=player_most_played_with_win_rate,player_most_played_against=player_most_played_against,player_most_played_against_win_rate=player_most_played_against_win_rate)
     else:
         # Render the form for selecting the player
-        players = get_players_full_list()
+        players = get_players(False)
         print(f"Available players: {players}")
         return render_template('metrics.html', players=players)
 
@@ -1112,8 +1097,8 @@ dash_app.layout = dbc.Container([
         dbc.Col(
             dcc.Dropdown(
                 id='player-dropdown',
-                options=[{'label': player, 'value': player} for player in get_players_full_list()],
-                value=['Matthieu', 'Lazare'],
+                options=[{'label': player, 'value': player} for player in get_players(False)],
+                value=['Matthieu'],
                 multi=True
             ),
             width={"size": 10, "offset": 1},
@@ -1182,21 +1167,25 @@ dash_app.layout = dbc.Container([
 
 def update_rating_graph(players):
     fig = go.Figure()
-    for player in players:
+    for player_name in players:
+        player_id = 0
+        print(f"player_name: {player_name}")
+        if player_name != "Matthieu":
+            player_id = get_player_id(player_name)
         query = f"""SELECT
-        DISTINCT ON (DATE_TRUNC('day', m.match_timestamp))
-        DATE_TRUNC('day', m.match_timestamp) AS day_start,
-            CASE WHEN p.first_name = '{player}' THEN pr.rating ELSE NULL END AS rating
+        DISTINCT ON (DATE_TRUNC('minute', m.match_timestamp))
+        DATE_TRUNC('minute', m.match_timestamp) AS day_start,
+            CASE WHEN p.player_id = '{player_id}' THEN pr.rating ELSE NULL END AS rating
         FROM PlayerMatch pm
         JOIN Player p ON pm.player_id = p.player_id
         JOIN PlayerRating pr ON pm.player_match_id = pr.player_match_id
         JOIN Match m ON pm.match_id = m.match_id
-        WHERE p.first_name = '{player}'
-        ORDER BY DATE_TRUNC('day', m.match_timestamp) DESC, m.match_timestamp DESC
+        WHERE p.player_id = '{player_id}'
+        ORDER BY DATE_TRUNC('minute', m.match_timestamp) DESC, m.match_timestamp DESC
                         """
 
         data = pd.read_sql(query, engine)
-        fig.add_trace(go.Scatter(x=data['day_start'], y=data['rating'], name=player, line=dict(shape='spline')))
+        fig.add_trace(go.Scatter(x=data['day_start'], y=data['rating'], name=player_name, line=dict(shape='spline')))
     fig.update_xaxes(title_text='')
     fig.update_yaxes(title_text='')
     fig.update_layout(yaxis={'categoryorder':'total ascending'})
@@ -1255,4 +1244,4 @@ def update_rating_graph(players):
 
 if __name__ == '__main__':
     app.static_folder = 'static'
-    app.run(host='0.0.0.0', port=8082, debug=True)
+    app.run(host='0.0.0.0', port=1234, debug=False)

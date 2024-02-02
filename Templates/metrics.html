@@ -194,22 +194,22 @@
  <div class="metrics-action-grid">
   <div class="metrics-action">
     <span class="metric-label">Main Partner:</span>
-    <span class="metric-value">{{ player_most_played_with[0] }}</span>
+    <span class="metric-value">{{ player_most_played_with[0] }} {{ player_most_played_with[1] }}</span>
     <span class="metric-sub-label">({{ player_most_played_with[2] }} games)</span>
   </div>
   <div class="metrics-action">
     <span class="metric-label">Games Played:</span>
     <span class="metric-value">{{ total_games }}</span>
-    <span class="metric-sub-label">(avg {{ avg_score | round(1) }} points)</span>
+    <span class="metric-sub-label">(avg {% if avg_score != None %}{{ avg_score | round(1) }}{% endif %} points)</span>
   </div>
   <div class="metrics-action">
     <span class="metric-label">Main Rival:</span>
-    <span class="metric-value">{{ player_most_played_against[0] }}</span>
+    <span class="metric-value">{{ player_most_played_against[0] }} {{ player_most_played_against[1] }}</span>
     <span class="metric-sub-label">({{ player_most_played_against[4] }} games)</span>
   </div>
   <div class="metrics-action">
     <span class="metric-label">Best Partner:</span>
-    <span class="metric-value">{{ player_most_played_with_win_rate[0][0] }}</span>
+    <span class="metric-value">{{ player_most_played_with_win_rate[0][0] }} {{ player_most_played_with_win_rate[0][1] }}</span>
     <span class="metric-sub-label">({{ player_most_played_with_win_rate[0][5]|round(0) }}% win rate)</span>
   </div>
   <div class="metrics-action">
@@ -219,12 +219,12 @@
   </div>
   <div class="metrics-action">
     <span class="metric-label">Easiest Rival:</span>
-    <span class="metric-value">{{ player_most_played_against_win_rate[0][0] }}</span>
+    <span class="metric-value">{{ player_most_played_against_win_rate[0][0] }} {{ player_most_played_against_win_rate[0][1] }}</span>
     <span class="metric-sub-label">({{ player_most_played_against_win_rate[0][5]|round(0) }}% win rate)</span>
   </div>
   <div class="metrics-action">
     <span class="metric-label">Worst Partner:</span>
-    <span class="metric-value">{{ player_most_played_with_win_rate[-1][0] }}</span>
+    <span class="metric-value">{{ player_most_played_with_win_rate[-1][0] }} {{ player_most_played_with_win_rate[-1][1] }}</span>
     <span class="metric-sub-label">({{100- player_most_played_with_win_rate[-1][5]|round(0)}}% loss rate)</span>
   </div>
   <div class="metrics-action">
@@ -235,7 +235,7 @@
 
   <div class="metrics-action">
     <span class="metric-label">Strongest Rival:</span>
-    <span class="metric-value">{{ player_most_played_against_win_rate[-1][0] }}</span>
+    <span class="metric-value">{{ player_most_played_against_win_rate[-1][0] }} {{ player_most_played_against_win_rate[-1][1] }}</span>
     <span class="metric-sub-label">({{ 100- player_most_played_against_win_rate[-1][5]|round(0)}}% loss rate)</span>
   </div>
 </div>

@@ -63,10 +63,10 @@
     </tr>
     {% for player in player_rat_bef_and_aft %}
     <tr>
-        <td>{{ player[1] }}</td>
-        <td style="text-align:center">{{ player[2] }}</td>
-        <td style="text-align:center">{% if player[3] - player[2] > 0 %}+{% endif %}{{ player[3] - player[2] }}</td>
+        <td>{{ player[1] }} {{ player[2] }}</td>
         <td style="text-align:center">{{ player[3] }}</td>
+        <td style="text-align:center">{% if player[3] != None and player[4] != None %}{% if player[4] - player[3] > 0 %}+{% endif %}{{ player[4] - player[3] }}{% endif %}</td>
+        <td style="text-align:center">{{ player[4] }}</td>
       </tr>
     {% endfor %}
 </table>

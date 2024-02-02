@@ -40,8 +40,11 @@
         {% endfor %}
     </select>
     <!-- Team 1 Score Label -->
-    <label for="team1_score" class="score-label">Score</label>
-    <input type="number" id="team1_score" name="team1_score" value="" min="0" max="11" inputmode="numeric">
+    <div style="text-align:center;">
+      <label for="team1_score" class="score-label">Score</label>
+      <input type="range" id="team1_score" name="team1_score" value="0" min="0" max="8" inputmode="numeric" oninput="this.nextElementSibling.value = this.value">
+      <output>0</output>
+    </div>
     <br>
     <!-- Team 2 Label -->
     <label for="player1_name" class="team-label">Team 2 </label>
@@ -59,20 +62,24 @@
         {% endfor %}
     </select>
     <!-- Team 2 Score Label -->
-    <label for="team2_score" class="score-label">Score</label>
-    <input type="number" id="team2_score" name="team2_score" value="" min="0" max="11" inputmode="numeric">
+    <div style="text-align:center;">
+      <label for="team2_score" class="score-label">Score</label>
+      <input type="range" id="team2_score" name="team2_score" value="0" min="0" max="8" inputmode="numeric" oninput="this.nextElementSibling.value = this.value">
+      <output>0</output>
+    </div>
     <!-- Game Date Label -->
-    <label for="game_date" class="date-label">Date</label>
-        <input type="date" id="game_date" name="game_date" value="">
+
+    <label for="game_date" class="date-label"></label>
+        <!--<input type="date" id="game_date" name="game_date" value=""> -->
         <script>
           // Get today's date and format it as yyyy-mm-dd
-          var today = new Date();
-          var year = today.getFullYear();
-          var month = ('0' + (today.getMonth() + 1)).slice(-2);
-          var day = ('0' + today.getDate()).slice(-2);
-          var formattedDate = year + '-' + month + '-' + day;
+          //var today = new Date();
+          //var year = today.getFullYear();
+          //var month = ('0' + (today.getMonth() + 1)).slice(-2);
+          //var day = ('0' + today.getDate()).slice(-2);
+          //var formattedDate = year + '-' + month + '-' + day;
           // Set the default value of the game_date input to today's date
-          document.getElementById("game_date").value = formattedDate;
+          //document.getElementById("game_date").value = formattedDate;
       
           function validateForm() {
               // Get the selected player names
@@ -91,9 +98,9 @@
               const team1_score = document.getElementsByName("team1_score")[0].value;
               const team2_score = document.getElementsByName("team2_score")[0].value;
       
-              // Check if the scores are integers between 0 and 11
+              // Check if the scores are integers between 0 and 8
               if (!Number.isInteger(+team1_score) || !Number.isInteger(+team2_score)) {
-                  alert("Scores must be integers between 0 and 11.");
+                  alert("Scores must be integers between 0 and 8.");
                   return false;
               } 
       
@@ -103,9 +110,9 @@
                   return false;
               }
       
-              // Check if the scores are not greater than 11
-              if (team1_score > 11 || team2_score > 11) {
-                  alert("Scores cannot be greater than 11.");
+              // Check if the scores are not greater than 8
+              if (team1_score > 8 || team2_score > 8) {
+                  alert("Scores cannot be greater than 8.");
                   return false;
               }
 
@@ -116,8 +123,8 @@
               }
       
               // Check if one of the scores is equal to 11
-              if (team1_score != 11 && team2_score != 11) {
-                  alert("One of the scores must be equal to 11.");
+              if (team1_score != 8 && team2_score != 8) {
+                  alert("One of the scores must be equal to 8.");
                   return false;
               }
       
